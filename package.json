@@ -1,0 +1,28 @@
+{
+  "name": "youtube-composer",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@types/youtube": "^0.0.32",
+    "gh-pages": "^1.1.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^22.2.0",
+    "@types/node": "^9.4.7",
+    "@types/react": "^16.0.40",
+    "@types/react-dom": "^16.0.4",
+    "react-scripts-ts": "2.14.0",
+    "typescript": "^2.7.2"
+  },
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "homepage": "http://brycehanscomb.github.io/youtube-composer"
+}
