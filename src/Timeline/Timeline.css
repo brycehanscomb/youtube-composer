@@ -2,3 +2,23 @@
     grid-row: 3 / 4;
     grid-column: 1 / 3;
 }
+
+.Timeline__Controls {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.Timeline__ScrollContainer {
+    width: 100%;
+    overflow: auto;
+}
+
+.Timeline__Tracks {
+
+}
+
+.Timeline__Header {
+    width: 100%;
+    background: #cdcdcd;
+    padding: 3px;
+}
