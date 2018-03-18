@@ -1,0 +1,13 @@
+.App {
+  display: grid;
+  height: 100vh;
+  grid-template-rows:
+    2rem
+    auto
+    200px
+  ;
+  grid-template-columns:
+    50% 50%
+  ;
+}
+
