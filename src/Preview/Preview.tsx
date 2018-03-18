@@ -1,35 +1,111 @@
 import * as React from 'react';
+import { throttle } from 'lodash';
 
 export default class Preview extends React.Component<any> {
     state = {
-        readyPlayers: 0
+        readyPlayers: 0,
+        realTime: Date.now(),
+        initialTime: Math.min(...this.props.tracks.map(track => track.videoInPoint)),
+        time: Math.min(...this.props.tracks.map(track => track.videoInPoint))
     };
+
+    timeTicker;
 
     nodes = {};
 
     players : {[key: string]: YT.Player} = {};
 
+    constructor(props) {
+        super(props);
+
+        this.checkIfAnyPlayersShouldStart = throttle(
+            this.checkIfAnyPlayersShouldStart.bind(this),
+            333
+        );
+    }
+
+    startTime = () => {
+        this.setState({
+            realTime: Date.now(),
+            initialTime: Math.min(...this.props.tracks.map(track => track.videoInPoint))
+        }, this.storeTime);
+
+    };
+
+    stopTime = () => {
+        clearTimeout(this.timeTicker);
+
+        this.setState({
+            realTime: Date.now(),
+            initialTime: -1,
+            time: -1
+        });
+    };
+
+    storeTime = () => {
+        const timeDiff = Date.now() - this.state.realTime;
+
+        this.setState({
+            time: this.state.initialTime + timeDiff
+        });
+
+        this.timeTicker = setTimeout(this.storeTime, 333);
+    };
+
     componentDidUpdate() {
         if (this.state.readyPlayers === this.props.tracks.length) {
             this.props.onReady();
 
-            Object.entries(this.players).forEach(([videoId, player]) => {
+            if (!this.timeTicker) {
+                this.startTime();
+            }
+            //
+            // Object.entries(this.players).forEach(([videoId, player]) => {
+            //     // player.seekTo(this.getTrackData(videoId).videoInPoint / 1000, true);
+            //     // player.playVideo();
+            // });
+
+            this.checkIfAnyPlayersShouldStart();
+            this.checkIfAnyPlayersShouldStop();
+        }
+    }
+
+    getTime = () => {
+        return this.state.time;
+    };
+
+    checkIfAnyPlayersShouldStart() {
+        if (Object.values(this.players).every(p => p.getPlayerState() === YT.PlayerState.PLAYING)) {
+            return;
+        }
+
+        Object.entries(this.players).forEach(([videoId, player]) => {
+            const shouldTrackStart = this.getTime() >= this.getTrackData(videoId).trackStart;
+            const hasVideoPassedOutPoint = player.getCurrentTime() * 1000 >= this.getTrackData(videoId).videoOutPoint;
+            const isVideoPlaying = player.getPlayerState() === YT.PlayerState.PLAYING;
+            const hasVideoBeenStopped = player.getPlayerState() === YT.PlayerState.ENDED;
+
+            if (shouldTrackStart && !hasVideoPassedOutPoint && !isVideoPlaying && !hasVideoBeenStopped) {
                 player.seekTo(this.getTrackData(videoId).videoInPoint / 1000, true);
                 player.playVideo();
-            });
+            }
+        });
 
-            this.checkIfAnyPlayersShouldStop();
+        if (this.timeTicker) {
+            setTimeout(this.checkIfAnyPlayersShouldStart, 500);
         }
     }
 
     checkIfAnyPlayersShouldStop = () => {
         Object.entries(this.players).forEach(([videoId, player]) => {
-            if (player.getCurrentTime() * 1000 >= this.getTrackData(videoId).videoOutPoint) {
-                player.pauseVideo();
+            const hasVideoEnded = player.getCurrentTime() * 1000 >= this.getTrackData(videoId).videoOutPoint;
+            // const isTrack
+            if (hasVideoEnded) {
+                player.stopVideo();
             }
         });
 
-        setTimeout(this.checkIfAnyPlayersShouldStop, 500);
+        setTimeout(this.checkIfAnyPlayersShouldStop, 333);
     };
 
     getTrackData(videoId) {
@@ -49,10 +125,19 @@ export default class Preview extends React.Component<any> {
                             this.getTrackData(videoId).videoInPoint / 1000,
                             true
                         );
-                        player.pauseVideo();
-                        this.setState({
-                            readyPlayers: this.state.readyPlayers + 1
-                        });
+                        player.playVideo();
+                    },
+                    onStateChange: (event: YT.OnStateChangeEvent) => {
+                        if (event.data === YT.PlayerState.PLAYING && this.state.readyPlayers !== this.props.tracks.length) {
+                            player.pauseVideo();
+                            player.seekTo(
+                                this.getTrackData(videoId).videoInPoint / 1000,
+                                true
+                            );
+                            this.setState({
+                                readyPlayers: this.state.readyPlayers + 1
+                            });
+                        }
                     }
                 }
             });
@@ -62,23 +147,29 @@ export default class Preview extends React.Component<any> {
     }
 
     onPlayButtonPressed = () => {
-        Object.entries(this.players).forEach(([videoId, player]) => {
-            player.seekTo(this.getTrackData(videoId).videoInPoint / 1000, true);
-            player.playVideo();
-        });
+        // Object.entries(this.players).forEach(([videoId, player]) => {
+        //     player.seekTo(this.getTrackData(videoId).videoInPoint / 1000, true);
+        //     player.playVideo();
+        // });
+        this.startTime();
+        this.checkIfAnyPlayersShouldStart();
     };
 
     onStopButtonPressed = () => {
+        this.stopTime();
+
         Object.entries(this.players).forEach(([videoId, player]) => {
             // player.seekTo(this.getTrackData(videoId).videoInPoint / 1000, true);
             player.pauseVideo();
         });
+
     };
 
     render() {
         return (
             <div className="Preview">
                 <p>
+                    {this.getTime()}
                     <button onClick={this.onPlayButtonPressed}>
                         Play all
                     </button>
@@ -92,11 +183,13 @@ export default class Preview extends React.Component<any> {
                 }}>
                     {this.props.tracks.map(track => {
                         return (
-                            <div
-                                key={track.videoId}
-                                ref={el => this.nodes[track.videoId] = el}
-                            >
-                                Loading {track.videoId}...
+                            <div>
+                                <div
+                                    key={track.videoId}
+                                    ref={el => this.nodes[track.videoId] = el}
+                                >
+                                    Loading {track.videoId}...
+                                </div>
                             </div>
                         )
                     })}
