@@ -1,14 +1,51 @@
 import * as React from 'react';
 import './Timeline.css';
 import TimelineTrack from "../TimelineTrack/TimelineTrack";
+import {getWidth} from "../utils";
+import TimelinePlayhead from "../TimelinePlayhead/TimelinePlayhead";
 
 interface IState {
-    zoom: number
+    zoom: number,
+    playheadPosition: number
 }
 
 export default class Timeline extends React.Component<any, IState> {
     state = {
-        zoom: 0
+        zoom: 0,
+        playheadPosition: 0
+    };
+
+    private tracksEl : HTMLElement | null;
+
+    private playTimer;
+
+    play = () => {
+        this.setState({
+            playheadPosition: this.state.playheadPosition + 333
+        });
+
+        this.keepPlayheadInView();
+
+        this.playTimer = setTimeout(this.play, 333);
+    };
+
+    stop = () => {
+        clearTimeout(this.playTimer);
+        this.playTimer = null;
+        this.keepPlayheadInView();
+    };
+
+    keepPlayheadInView = () => {
+        if (!this.tracksEl || !this.tracksEl.parentElement) {
+            return;
+        }
+
+        const rightPosOfTimeline = this.getTimelineWidth() + this.tracksEl.parentElement.scrollLeft;
+        const playheadPosition = this.getPlayheadPosition();
+
+        if (playheadPosition > rightPosOfTimeline) {
+            this.tracksEl.parentElement.scrollLeft = playheadPosition;
+        }
     };
 
     onZoomChanged = (event : React.ChangeEvent<HTMLInputElement>) => {
@@ -17,11 +54,29 @@ export default class Timeline extends React.Component<any, IState> {
         });
     };
 
+    getPlayheadPosition = () => {
+        return getWidth(this.state.playheadPosition, this.state.zoom);
+    };
+
+    getTimelineWidth = () => {
+        if (!this.tracksEl) {
+            return 0;
+        }
+
+        return this.tracksEl.getBoundingClientRect().width;
+    };
+
     render() {
         return (
             <div className="Timeline">
                 <div className="Timeline__Controls">
-                    <button>
+                    <button onClick={() => {
+                        if (this.playTimer) {
+                            this.stop();
+                        } else {
+                            this.play();
+                        }
+                    }}>
                         Play / Stop
                     </button>
                     <label>
@@ -37,14 +92,19 @@ export default class Timeline extends React.Component<any, IState> {
                     </label>
                 </div>
                 <div className="Timeline__ScrollContainer">
-                    <div className="Timeline__Tracks">
+                    <div className="Timeline__Tracks" ref={el => this.tracksEl = el}>
                         <div className="Timeline__Header">
-
+                            <TimelinePlayhead
+                                timelineWidth={this.getTimelineWidth()}
+                                currentTime={this.state.playheadPosition}
+                                zoom={this.state.zoom}
+                            />
                         </div>
                         {this.props.tracks.map(track => {
                             return (
                                 <TimelineTrack
                                     zoom={this.state.zoom}
+                                    startOffset={track.trackStart}
                                     duration={track.duration}
                                     videoId={track.videoId}
                                     key={track.videoId}

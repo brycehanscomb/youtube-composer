@@ -7,7 +7,8 @@ export default class TimelineTrack extends React.Component<any, any> {
         return (
             <div className="TimelineTrack" style={{
                 backgroundImage: `url("http://img.youtube.com/vi/${this.props.videoId}/default.jpg")`,
-                width: getWidth(this.props.duration, this.props.zoom)
+                width: getWidth(this.props.duration, this.props.zoom),
+                marginLeft: getWidth(this.props.startOffset, this.props.zoom)
             }} />
         );
     }

@@ -14,7 +14,12 @@ export const zoomCoefficients = {
     '6': 500
 };
 
-export function getWidth(duration, zoom) {
-    const seconds = duration / 1000;
-    return Math.floor(seconds) * zoomCoefficients[zoom];
+export function getWidth(duration : number, zoom, useMsPrecision : boolean = false) {
+    if (useMsPrecision) {
+        return duration * zoomCoefficients[zoom];
+    } else {
+        const seconds = duration / 1000;
+        return Math.floor(seconds) * zoomCoefficients[zoom];
+    }
+
 }

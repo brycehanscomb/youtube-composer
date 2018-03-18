@@ -20,5 +20,26 @@
 .Timeline__Header {
     width: 100%;
     background: #cdcdcd;
-    padding: 3px;
+}
+
+.Timeline__Playhead {
+    display: inline-block;
+    width: 10px;
+    height: 8px;
+    background: blue;
+    border: 1px solid white;
+    position: relative;
+    transition: left 0.333s linear;
+}
+
+.Timeline__Playhead::after {
+    position: absolute;
+    content: '';
+    display: inline-block;
+    height: 100px;
+    width: 2px;
+    margin-top: 6px;
+    margin-left: 2px;
+    border: 1px solid white;
+    background: blue;
 }
