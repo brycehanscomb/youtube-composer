@@ -68,12 +68,22 @@ export default class Preview extends React.Component<any> {
         });
     };
 
+    onStopButtonPressed = () => {
+        Object.entries(this.players).forEach(([videoId, player]) => {
+            // player.seekTo(this.getTrackData(videoId).videoInPoint / 1000, true);
+            player.pauseVideo();
+        });
+    };
+
     render() {
         return (
             <div className="Preview">
                 <p>
                     <button onClick={this.onPlayButtonPressed}>
                         Play all
+                    </button>
+                    <button onClick={this.onStopButtonPressed}>
+                        Stop
                     </button>
                 </p>
                 <div style={{

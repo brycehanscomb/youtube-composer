@@ -16,13 +16,12 @@ interface IProps {
 function getTimeLabel(totalMs : number, percentage : number) : string {
     const targetMs = (totalMs / 100) * percentage;
 
+    const ms = targetMs % 1000;
     const second = (targetMs / 1000) % 60;
     const minute = (targetMs / (1000 * 60)) % 60;
     const hour = (targetMs / (1000 * 60 * 60)) % 24;
 
-    // return `${hour}:${minute}:${second}`;
-
-    return [hour, minute, second]
+    return [hour, minute, second, ms]
         .map(Math.floor)
         .map(val => {
             if (val < 10) {
