@@ -1,130 +1,82 @@
 import * as React from 'react';
 import './App.css';
-import Player from "./Player/Player";
+import Tracks from "./Tracks/Tracks";
+import {getVideoDuration} from "./MetaGatherer";
 
 class App extends React.Component {
     state = {
-        isYoutubeAPIReady: false,
         tracks: [
             {
-                videoId: 'YYfWpUvtJhs',
-                trackStartTime: 0,
-                videoStartPoint: 76750
-            },
-            {
-                videoId: 'T7iVpEwmuRo',
-                trackStartTime: 0,
-                videoStartPoint: 0
+                videoId: '7nEpsW2kEFA',
+                videoInPoint: 0,
+                videoOutPoint: -1
             }
         ],
-        readyTracks: 0,
-        timelineStartedAt: -1,
-        currentTimelineTick: -1
+        durations: {}
     };
-
-    shouldVideoBePlaying = (track : any) => {
-        if (this.state.readyTracks !== this.state.tracks.length) {
-            return false;
-        }
-
-        if (this.getTime() >= track.trackStartTime) {
-            return true;
-        }
-
-        return false;
-    };
-
-    startTimer() {
-        this.setState({
-            timelineStartedAt: Date.now()
-        });
-        this.updateTimer();
-    }
-
-    updateTimer = () => {
-        this.setState({
-            currentTimelineTick: Date.now()
-        }, () => {
-            setTimeout(this.updateTimer, (1000 / 30));
-        });
-    };
-
-    getTime() {
-        return this.state.currentTimelineTick - this.state.timelineStartedAt;
-    }
 
     componentDidMount() {
-        this.checkYoutubeAPI();
+        this.state.tracks.forEach(track => {
+            getVideoDuration(track.videoId).then((duration) => {
+                this.setState({
+                    durations: {
+                        ...this.state.durations,
+                        [track.videoId]: duration
+                    },
+                    tracks: this.state.tracks.map(it => {
+                        if (it.videoId !== track.videoId) {
+                            return it;
+                        }
+
+                        return {
+                            ...track,
+                            videoOutPoint: duration
+                        };
+                    })
+                });
+            });
+        });
     }
 
-    checkYoutubeAPI = () => {
-        if (global['YT']) {
-            this.setState({
-                isYoutubeAPIReady: true
-            });
-        } else {
-            setTimeout(this.checkYoutubeAPI, 1000);
-        }
-    };
+    onTrim = (track : any, whichEnd: string, newTrimValue : number) => {
+        const duration = this.state.durations[track.videoId];
 
-    onTrackPlayerReady = () => {
-        this.setState(
-            { readyTracks: this.state.readyTracks + 1 },
-            () => {
-            if (this.state.readyTracks === this.state.tracks.length) {
-                this.startTimer();
-            }
+        const trimPointInMs = (duration / 100) * newTrimValue;
+
+        this.setState({
+            tracks: this.state.tracks.map(it => {
+                if (it.videoId !== track.videoId) {
+                    return it;
+                }
+
+                switch(whichEnd) {
+                    case 'start':
+                        return {
+                            ...it,
+                            videoInPoint: trimPointInMs
+                        };
+                    case 'end':
+                        return {
+                            ...it,
+                            videoOutPoint: duration - trimPointInMs
+                        };
+                    default:
+                        throw new RangeError('Wrong value');
+                }
+            })
         });
+
+
     };
 
     render() {
-        if (!this.state.isYoutubeAPIReady) {
-            return 'Waiting on YT...';
-        }
-
         return (
             <div>
-                <div className='App'>
-                    {this.state.tracks.map(track => {
-                        return (
-                            <Player
-                                key={track.videoId}
-                                delay={track.trackStartTime}
-                                videoId={track.videoId}
-                                startPoint={track.videoStartPoint}
-                                play={this.shouldVideoBePlaying(track)}
-                                onReady={this.onTrackPlayerReady}
-                            />
-                        );
-                    })}
-                </div>
-                {this.state.tracks[0].videoId !== '-eohHwsplvY' && (
-                    <p>
-                        <button onClick={() => {
-                            this.setState({
-                                tracks: [
-                                    {
-                                        videoId: '-eohHwsplvY', // NY I love you
-                                        videoStartPoint: 0,
-                                        trackStartTime: 0
-                                    },
-                                    {
-                                        videoId: '3io0Ttj74Ro', // Elevator to the gallows,
-                                        videoStartPoint: 0,
-                                        trackStartTime: 33000
-                                    },
-                                ],
-                                readyTracks: 0,
-                                timelineStartedAt: -1,
-                                currentTimelineTick: -1
-                            });
-                        }}>
-                            <big>
-                                Try another set of videos
-                            </big>
-                        </button>
-                    </p>
-                )}
+                <Tracks
+                    tracks={this.state.tracks}
+                    durations={this.state.durations}
+                    onTrim={this.onTrim}
+                />
             </div>
         );
     }
