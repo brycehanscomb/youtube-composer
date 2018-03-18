@@ -34,6 +34,10 @@ function getTimeLabel(totalMs : number, percentage : number) : string {
         .join(':');
 }
 
+function msToPercent(totalMs, fractionalMs) {
+    return (fractionalMs / totalMs) * 100;
+}
+
 export default class Track extends React.Component<IProps> {
     private rootNode : HTMLElement | null;
     private cropStartHandle : HTMLElement | null;
@@ -41,7 +45,7 @@ export default class Track extends React.Component<IProps> {
     private trackWidth : number = 0;
 
     state = {
-        cropStart: 0,
+        cropStart: msToPercent(this.props.duration, this.props.videoInPoint),
         cropEnd: 0
     };
 

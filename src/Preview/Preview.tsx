@@ -76,16 +76,21 @@ export default class Preview extends React.Component<any> {
                         Play all
                     </button>
                 </p>
-                {this.props.tracks.map(track => {
-                    return (
-                        <div
-                            key={track.videoId}
-                            ref={el => this.nodes[track.videoId] = el}
-                        >
-                            Loading {track.videoId}...
-                        </div>
-                    )
-                })}
+                <div style={{
+                    display: 'flex',
+
+                }}>
+                    {this.props.tracks.map(track => {
+                        return (
+                            <div
+                                key={track.videoId}
+                                ref={el => this.nodes[track.videoId] = el}
+                            >
+                                Loading {track.videoId}...
+                            </div>
+                        )
+                    })}
+                </div>
             </div>
         );
     }

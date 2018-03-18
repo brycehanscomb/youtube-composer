@@ -7,10 +7,18 @@ import Preview from "./Preview/Preview";
 class App extends React.Component {
     state = {
         tracks: [
+            // {
+            //     videoId: 'mto2mNFbrps',
+            //     videoInPoint: 0,
+            //     videoOutPoint: -1
+            // }
             {
-                videoId: 'mto2mNFbrps',
-                videoInPoint: 0,
-                videoOutPoint: -1
+                videoId: 'YYfWpUvtJhs',
+                videoInPoint: 76750 + 210000
+            },
+            {
+                videoId: 'T7iVpEwmuRo',
+                videoInPoint: 0 + 210000
             }
         ],
         durations: {}
