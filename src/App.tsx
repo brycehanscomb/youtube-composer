@@ -2,12 +2,13 @@ import * as React from 'react';
 import './App.css';
 import Tracks from "./Tracks/Tracks";
 import {getVideoDuration} from "./MetaGatherer";
+import Preview from "./Preview/Preview";
 
 class App extends React.Component {
     state = {
         tracks: [
             {
-                videoId: '7nEpsW2kEFA',
+                videoId: 'mto2mNFbrps',
                 videoInPoint: 0,
                 videoOutPoint: -1
             }
@@ -65,7 +66,20 @@ class App extends React.Component {
                 }
             })
         });
+    };
 
+    getPreviewState = () => {
+        return {
+            tracks: this.state.tracks.map(track => {
+                return {
+                    ...track,
+                    duration: this.state.durations[track.videoId]
+                };
+            })
+        };
+    };
+
+    onPreviewReady = () => {
 
     };
 
@@ -77,6 +91,7 @@ class App extends React.Component {
                     durations={this.state.durations}
                     onTrim={this.onTrim}
                 />
+                <Preview {...this.getPreviewState()} onReady={this.onPreviewReady} />
             </div>
         );
     }
