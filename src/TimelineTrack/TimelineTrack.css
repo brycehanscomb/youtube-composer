@@ -1,5 +1,40 @@
 .TimelineTrack {
-    display: block;
+    display: flex;
     height: 50px;
     background-size: contain;
+    justify-content: space-between;
+}
+
+.TimelineTrack__CropHandle {
+    display: inline-block;
+    height: 100%;
+    background: rgba(255,255,255,0.666);
+    width: 25px;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.TimelineTrack__CropHandle:hover {
+    background: white;
+}
+
+.TimelineTrack__CropHandle:active {
+    background: #cdcdcd;
+}
+
+.TimelineTrack__CropHandle.left {
+    cursor: e-resize;
+    border-left: 1px solid #cdcdcd;
+}
+
+.TimelineTrack__CropHandle.right {
+    cursor: w-resize;
+    border-right: 1px solid #cdcdcd;
+}
+
+.TimelineTrack__NudgeHandle {
+    display: inline-block;
+    flex-grow: 1;
+    background: rgba(255,0,0,0.5);
+    cursor: move;
 }

@@ -66,6 +66,14 @@ export default class Timeline extends React.Component<any, IState> {
         return this.tracksEl.getBoundingClientRect().width;
     };
 
+    handleTrackTrim = (track, whichEnd : 'start' | 'end', delta : number) => {
+        this.props.onTrimStart(track, delta);
+    };
+
+    handleTrackNudge = (track, delta : number) => {
+        this.props.onTrackNudge(track, delta);
+    };
+
     render() {
         return (
             <div className="Timeline">
@@ -108,6 +116,8 @@ export default class Timeline extends React.Component<any, IState> {
                                     duration={track.duration}
                                     videoId={track.videoId}
                                     key={track.videoId}
+                                    onTrim={(whichEnd, delta) => this.handleTrackTrim(track, whichEnd, delta)}
+                                    onNudge={delta => this.handleTrackNudge(track, delta)}
                                 />
                             );
                         })}

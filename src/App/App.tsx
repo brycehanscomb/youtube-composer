@@ -8,8 +8,8 @@ export default class App extends React.Component {
     state = {
         tracks: [
             {
-                videoId: 'O9Nxe5P_HoA',
-                videoInPoint: 38000,
+                videoId: 'QjxScn7cKo8',
+                videoInPoint: 0,
                 trackStart: 0,
                 duration: -1
             },
@@ -45,13 +45,49 @@ export default class App extends React.Component {
         );
     };
 
+    onTrackNudge = (track, delta : number) => {
+        this.setState({
+            tracks: this.state.tracks.map(it => {
+                if (it !== track) {
+                    return it;
+                } else {
+                    const newValue = it.trackStart + delta;
+
+                    return {
+                        ...track,
+                        trackStart: Math.max(0, newValue)
+                    };
+                }
+            })
+        });
+    };
+
+    onTrimStart = (track, delta : number) => {
+        this.setState({
+            tracks: this.state.tracks.map(it => {
+                if (it !== track) {
+                    return it;
+                } else {
+                    return {
+                        ...track,
+                        videoInPoint: it.videoInPoint + delta
+                    };
+                }
+            })
+        });
+    };
+
     render() {
         return (
             <div className="App">
                 <header>Header</header>
                 <div className="middle">Working area</div>
                 <WaitFor when={this.areDurationsReady()}>
-                    <Timeline tracks={this.state.tracks} />
+                    <Timeline
+                        tracks={this.state.tracks}
+                        onTrimStart={this.onTrimStart}
+                        onTrackNudge={this.onTrackNudge}
+                    />
                 </WaitFor>
             </div>
         );
