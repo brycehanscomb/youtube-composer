@@ -35,6 +35,14 @@
 .TimelineTrack__NudgeHandle {
     display: inline-block;
     flex-grow: 1;
-    background: rgba(255,0,0,0.5);
-    cursor: move;
+    cursor: grab;
+}
+
+.TimelineTrack__NudgeHandle:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.TimelineTrack__NudgeHandle:active {
+    cursor: grabbing;
+    background: rgba(0,0,0,0.2);
 }
