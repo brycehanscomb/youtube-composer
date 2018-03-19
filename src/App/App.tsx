@@ -11,13 +11,15 @@ export default class App extends React.Component {
                 videoId: 'QjxScn7cKo8',
                 videoInPoint: 2000,
                 trackStart: 2000,
-                duration: -1
+                duration: -1,
+                videoOutPoint: -1
             },
             {
                 videoId: '-UxD1FObOH4',
                 videoInPoint: 41500,
                 trackStart: 0,
-                duration: -1
+                duration: -1,
+                videoOutPoint: -1
             },
         ]
     };
@@ -27,12 +29,13 @@ export default class App extends React.Component {
             this.state.tracks
                 .map(track => track.videoId)
                 .map(getVideoDuration)
-        ).then(durations => {
+        ).then((durations : Array<number>) => {
             this.setState({
                 tracks: this.state.tracks.map((track, index) => {
                     return {
                         ...track,
-                        duration: durations[index]
+                        duration: durations[index],
+                        videoOutPoint: durations[index] - track.videoInPoint
                     };
                 })
             })
@@ -73,18 +76,63 @@ export default class App extends React.Component {
 
                     if (newInPoint < 0) {
                         const distanceFromZero = 0 - newInPoint;
+                        const canTakeFromRightCrop = track.videoOutPoint < track.duration;
 
-                        return {
-                            ...track,
-                            videoInPoint: 0,
-                            trackStart: newTrackStart + distanceFromZero
-                        };
+                        if (canTakeFromRightCrop) {
+                            return {
+                                ...track,
+                                videoOutPoint: track.videoOutPoint + distanceFromZero,
+                                trackStart: newTrackStart - (delta + distanceFromZero)
+                            };
+                        } else {
+                            return {
+                                ...track,
+                                videoInPoint: 0,
+                                trackStart: newTrackStart + distanceFromZero
+                            };
+                        }
                     }
 
                     return {
                         ...track,
                         videoInPoint: Math.max(0, newInPoint),
                         trackStart: Math.max(0, newTrackStart)
+                    };
+                }
+            })
+        });
+    };
+
+    onTrimEnd = (track, delta : number) => {
+        this.setState({
+            tracks: this.state.tracks.map(it => {
+                if (it !== track) {
+                    return it;
+                } else {
+                    const newOutPoint = it.videoOutPoint + delta;
+
+                    // if (newOutPoint < 0) {
+                    //     const distanceFromZero = 0 - newOutPoint;
+                    //     const canTakeFromRightCrop = track.videoOutPoint < track.duration;
+                    //
+                    //     if (canTakeFromRightCrop) {
+                    //         return {
+                    //             ...track,
+                    //             videoOutPoint: track.videoOutPoint + distanceFromZero,
+                    //             trackStart: newTrackStart - (delta + distanceFromZero)
+                    //         };
+                    //     } else {
+                    //         return {
+                    //             ...track,
+                    //             videoOutPoint: 0,
+                    //             trackStart: newTrackStart + distanceFromZero
+                    //         };
+                    //     }
+                    // }
+
+                    return {
+                        ...track,
+                        videoOutPoint: Math.min(track.duration, newOutPoint)
                     };
                 }
             })
@@ -100,6 +148,7 @@ export default class App extends React.Component {
                     <Timeline
                         tracks={this.state.tracks}
                         onTrimStart={this.onTrimStart}
+                        onTrimEnd={this.onTrimEnd}
                         onTrackNudge={this.onTrackNudge}
                     />
                 </WaitFor>

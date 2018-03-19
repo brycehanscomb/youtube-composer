@@ -10,7 +10,8 @@ interface IProps {
     startOffset: number,
     onTrim: (whichEnd : 'start' | 'end', delta: number) => void,
     onNudge: (delta: number) => void,
-    videoInPoint: number
+    videoInPoint: number,
+    videoOutPoint: number,
 }
 
 export default class TimelineTrack extends React.Component<IProps, any> {
@@ -29,6 +30,9 @@ export default class TimelineTrack extends React.Component<IProps, any> {
 
         interact(this.cropHandleLeft).draggable({ axis: 'x' })
             .on('dragmove', this.onCropHandleDragMove.bind(this, 'start'));
+
+        interact(this.cropHandleRight).draggable({ axis: 'x' })
+            .on('dragmove', this.onCropHandleDragMove.bind(this, 'end'));
     }
 
     onNudgeHandleDragMove = (event: Interact.InteractEvent) => {
@@ -38,22 +42,14 @@ export default class TimelineTrack extends React.Component<IProps, any> {
 
     onCropHandleDragMove = (whichEnd : 'start' | 'end', event : Interact.InteractEvent) => {
         const deltaTime = getMilliSecondsFromPixelWidth(event.dx, this.props.zoom);
-        // this.props.onNudge(deltaTime);
         this.props.onTrim(whichEnd, deltaTime);
-
-        // const cropStartXPos = getWidth(this.props.startOffset, this.props.zoom);
-
-        // console.log(cropStartXPos);
-
-        // const deltaTime = getMilliSecondsFromPixelWidth(cropStartXPos + event.dx, this.props.zoom) * 1000;
-        //
     };
 
     render() {
         return (
             <div className="TimelineTrack" style={{
                 backgroundImage: `url("http://img.youtube.com/vi/${this.props.videoId}/default.jpg")`,
-                width: getWidth(this.props.duration - this.props.videoInPoint, this.props.zoom),
+                width: getWidth(this.props.videoOutPoint - this.props.videoInPoint, this.props.zoom),
                 marginLeft: getWidth(this.props.startOffset, this.props.zoom)
             }}>
                 <div ref={el => this.cropHandleLeft = el} className="TimelineTrack__CropHandle left" />

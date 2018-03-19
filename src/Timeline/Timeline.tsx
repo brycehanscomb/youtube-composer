@@ -67,7 +67,14 @@ export default class Timeline extends React.Component<any, IState> {
     };
 
     handleTrackTrim = (track, whichEnd : 'start' | 'end', delta : number) => {
-        this.props.onTrimStart(track, delta);
+        switch(whichEnd) {
+            case 'start':
+                this.props.onTrimStart(track, delta);
+            break;
+            case 'end':
+                this.props.onTrimEnd(track, delta);
+            break;
+        }
     };
 
     handleTrackNudge = (track, delta : number) => {
@@ -113,6 +120,7 @@ export default class Timeline extends React.Component<any, IState> {
                                 <TimelineTrack
                                     zoom={this.state.zoom}
                                     videoInPoint={track.videoInPoint}
+                                    videoOutPoint={track.videoOutPoint}
                                     startOffset={track.trackStart}
                                     duration={track.duration}
                                     videoId={track.videoId}
