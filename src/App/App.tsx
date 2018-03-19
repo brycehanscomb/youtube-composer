@@ -9,14 +9,14 @@ export default class App extends React.Component {
         tracks: [
             {
                 videoId: 'QjxScn7cKo8',
-                videoInPoint: 2000,
-                trackStart: 2000,
+                videoInPoint: 0,
+                trackStart: 0,
                 duration: -1,
                 videoOutPoint: -1
             },
             {
                 videoId: '-UxD1FObOH4',
-                videoInPoint: 41500,
+                videoInPoint: 0,
                 trackStart: 0,
                 duration: -1,
                 videoOutPoint: -1
