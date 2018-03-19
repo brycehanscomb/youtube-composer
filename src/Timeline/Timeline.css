@@ -30,6 +30,7 @@
     border: 1px solid white;
     position: relative;
     transition: left 0.333s linear;
+    transform: translateX(-50%);
 }
 
 .Timeline__Playhead::after {
