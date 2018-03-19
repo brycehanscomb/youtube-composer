@@ -18,9 +18,7 @@ export default class Timeline extends React.Component<any, IState> {
     private playTimer;
 
     rewind = () => {
-        this.setState({
-            playheadPosition: 0
-        });
+        this.props.onPlayheadMove(0 - this.props.playheadPosition);
     };
 
     play = () => {
@@ -82,9 +80,7 @@ export default class Timeline extends React.Component<any, IState> {
     };
 
     handlePlayheadMoved = (delta : number) => {
-        this.setState({
-            playheadPosition: this.state.playheadPosition + delta
-        });
+        this.props.onPlayheadMove(delta);
     };
 
     render() {
