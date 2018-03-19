@@ -24,13 +24,18 @@
 
 .Timeline__Playhead {
     display: inline-block;
-    width: 10px;
-    height: 8px;
+    width: 14px;
+    height: 10px;
     background: blue;
     border: 1px solid white;
     position: relative;
-    transition: left 0.333s linear;
+    will-change: left;
     transform: translateX(-50%);
+    cursor: grab;
+}
+
+.Timeline__Playhead:active {
+    cursor: grabbing;
 }
 
 .Timeline__Playhead::after {
@@ -39,8 +44,8 @@
     display: inline-block;
     height: 100px;
     width: 2px;
-    margin-top: 6px;
-    margin-left: 2px;
+    margin-top: 8px;
+    margin-left: 4px;
     border: 1px solid white;
     background: blue;
 }

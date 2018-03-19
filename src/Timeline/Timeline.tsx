@@ -19,6 +19,12 @@ export default class Timeline extends React.Component<any, IState> {
 
     private playTimer;
 
+    rewind = () => {
+        this.setState({
+            playheadPosition: 0
+        });
+    };
+
     play = () => {
         this.setState({
             playheadPosition: this.state.playheadPosition + 333
@@ -81,10 +87,19 @@ export default class Timeline extends React.Component<any, IState> {
         this.props.onTrackNudge(track, delta);
     };
 
+    handlePlayheadMoved = (delta : number) => {
+        this.setState({
+            playheadPosition: this.state.playheadPosition + delta
+        });
+    };
+
     render() {
         return (
             <div className="Timeline">
                 <div className="Timeline__Controls">
+                    <button onClick={this.rewind}>
+                        &lt;- Rewind
+                    </button>
                     <button onClick={() => {
                         if (this.playTimer) {
                             this.stop();
@@ -113,6 +128,7 @@ export default class Timeline extends React.Component<any, IState> {
                                 timelineWidth={this.getTimelineWidth()}
                                 currentTime={this.state.playheadPosition}
                                 zoom={this.state.zoom}
+                                onMove={this.handlePlayheadMoved}
                             />
                         </div>
                         {this.props.tracks.map(track => {
