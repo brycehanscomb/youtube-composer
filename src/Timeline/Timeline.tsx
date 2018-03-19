@@ -44,7 +44,7 @@ export default class Timeline extends React.Component<any, IState> {
         const playheadPosition = this.getPlayheadPosition();
 
         if (playheadPosition > rightPosOfTimeline) {
-            this.tracksEl.parentElement.scrollLeft = playheadPosition;
+            this.tracksEl.parentElement.scrollLeft = playheadPosition - (this.getTimelineWidth() / 3);
         }
     };
 
