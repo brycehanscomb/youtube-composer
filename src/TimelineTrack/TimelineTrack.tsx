@@ -35,6 +35,16 @@ export default class TimelineTrack extends React.Component<IProps, any> {
             .on('dragmove', this.onCropHandleDragMove.bind(this, 'end'));
     }
 
+    componentWillUnmount() {
+        if (!this.cropHandleLeft || !this.cropHandleRight || !this.nudgeHandle) {
+            return;
+        }
+
+        interact(this.nudgeHandle).unset();
+        interact(this.cropHandleLeft).unset();
+        interact(this.cropHandleRight).unset();
+    }
+
     onNudgeHandleDragMove = (event: Interact.InteractEvent) => {
         const deltaTime = getMilliSecondsFromPixelWidth(event.dx, this.props.zoom);
         this.props.onNudge(deltaTime);
