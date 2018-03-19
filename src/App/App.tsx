@@ -3,12 +3,24 @@ import './App.css';
 import Timeline from "../Timeline/Timeline";
 import {getVideoDuration} from "../MetaGatherer";
 import WaitFor from "../WaitFor/WaitFor";
+import Preview from "../Preview/Preview";
 
-export default class App extends React.Component {
+export interface EditorTrack {
+    videoId: string,
+    videoInPoint: number,
+    trackStart: number,
+    duration: number,
+    videoOutPoint: number
+}
+
+export default class App extends React.Component<any, {
+    tracks: Array<EditorTrack>,
+    playheadPosition: number
+}> {
     state = {
         tracks: [
             {
-                videoId: 'QjxScn7cKo8',
+                videoId: 'jo2FxCXDTPM',
                 videoInPoint: 0,
                 trackStart: 0,
                 duration: -1,
@@ -21,7 +33,8 @@ export default class App extends React.Component {
                 duration: -1,
                 videoOutPoint: -1
             },
-        ]
+        ],
+        playheadPosition: 0
     };
 
     componentDidMount() {
@@ -139,13 +152,28 @@ export default class App extends React.Component {
         });
     };
 
+    handlePlayheadPositionChange = (delta : number) : void => {
+        this.setState({
+            playheadPosition: this.state.playheadPosition + delta
+        });
+    };
+
     render() {
         return (
             <div className="App">
                 <header>Header</header>
-                <div className="middle">Working area</div>
+                <div className="middle">
+                    <WaitFor when={this.areDurationsReady()}>
+                        <Preview
+                            time={this.state.playheadPosition}
+                            tracks={this.state.tracks}
+                        />
+                    </WaitFor>
+                </div>
                 <WaitFor when={this.areDurationsReady()}>
                     <Timeline
+                        onPlayheadMove={this.handlePlayheadPositionChange}
+                        playheadPosition={this.state.playheadPosition}
                         tracks={this.state.tracks}
                         onTrimStart={this.onTrimStart}
                         onTrimEnd={this.onTrimEnd}

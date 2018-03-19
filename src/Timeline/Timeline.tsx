@@ -6,13 +6,11 @@ import TimelinePlayhead from "../TimelinePlayhead/TimelinePlayhead";
 
 interface IState {
     zoom: number,
-    playheadPosition: number
 }
 
 export default class Timeline extends React.Component<any, IState> {
     state = {
         zoom: 0,
-        playheadPosition: 0
     };
 
     private tracksEl : HTMLElement | null;
@@ -20,12 +18,8 @@ export default class Timeline extends React.Component<any, IState> {
     private playTimer;
 
     play = () => {
-        this.setState({
-            playheadPosition: this.state.playheadPosition + 333
-        });
-
+        this.props.onPlayheadMove(333);
         this.keepPlayheadInView();
-
         this.playTimer = setTimeout(this.play, 333);
     };
 
@@ -55,7 +49,7 @@ export default class Timeline extends React.Component<any, IState> {
     };
 
     getPlayheadPosition = () => {
-        return getWidth(this.state.playheadPosition, this.state.zoom);
+        return getWidth(this.props.playheadPosition, this.state.zoom);
     };
 
     getTimelineWidth = () => {
@@ -111,7 +105,7 @@ export default class Timeline extends React.Component<any, IState> {
                         <div className="Timeline__Header">
                             <TimelinePlayhead
                                 timelineWidth={this.getTimelineWidth()}
-                                currentTime={this.state.playheadPosition}
+                                currentTime={this.props.playheadPosition}
                                 zoom={this.state.zoom}
                             />
                         </div>
