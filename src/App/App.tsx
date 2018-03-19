@@ -51,7 +51,6 @@ export default class App extends React.Component {
                 if (it !== track) {
                     return it;
                 } else {
-                    // console.log(delta);
                     const newValue = it.trackStart + delta;
 
                     return {
@@ -69,10 +68,23 @@ export default class App extends React.Component {
                 if (it !== track) {
                     return it;
                 } else {
+                    const newInPoint = it.videoInPoint + delta;
+                    const newTrackStart = it.trackStart + delta;
+
+                    if (newInPoint < 0) {
+                        const distanceFromZero = 0 - newInPoint;
+
+                        return {
+                            ...track,
+                            videoInPoint: 0,
+                            trackStart: newTrackStart + distanceFromZero
+                        };
+                    }
+
                     return {
                         ...track,
-                        videoInPoint: it.videoInPoint + delta,
-                        trackStart: it.trackStart + delta
+                        videoInPoint: Math.max(0, newInPoint),
+                        trackStart: Math.max(0, newTrackStart)
                     };
                 }
             })
