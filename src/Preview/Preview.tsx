@@ -95,7 +95,7 @@ export default class Preview extends React.Component<IProps, IState> {
                         if (event.data === YT.PlayerState.PLAYING) {
                             if (this.isReady() === false) {
                                 player.pauseVideo();
-                                player.setVolume(100);
+                                player.setVolume(track.volume);
                                 player.seekTo(track.videoInPoint / 1000, true);
                                 this.players.set(track, player);
                                 this.setState({

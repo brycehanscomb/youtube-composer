@@ -10,7 +10,8 @@ export interface EditorTrack {
     videoInPoint: number,
     trackStart: number,
     duration: number,
-    videoOutPoint: number
+    videoOutPoint: number,
+    volume: number
 }
 
 export default class App extends React.Component<any, {
@@ -24,14 +25,16 @@ export default class App extends React.Component<any, {
                 videoInPoint: 0,
                 trackStart: 0,
                 duration: -1,
-                videoOutPoint: -1
+                videoOutPoint: -1,
+                volume: 100
             },
             {
                 videoId: '-UxD1FObOH4',
                 videoInPoint: 0,
                 trackStart: 0,
                 duration: -1,
-                videoOutPoint: -1
+                videoOutPoint: -1,
+                volume: 100
             },
         ],
         playheadPosition: 0
