@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {EditorTrack} from "../App/App";
-import * as lodash from 'lodash';
+import {throttle} from 'lodash';
 
 interface IProps {
     tracks: Array<EditorTrack>,
@@ -36,9 +36,15 @@ export default class Preview extends React.Component<IProps, IState> {
         this.playerNodes.set(track, el);
     };
 
-    private sync = () => {
+    constructor(props) {
+        super(props);
+
+        this.sync = throttle(this.sync.bind(this), 2000);
+    }
+
+    private sync() {
         this.players.forEach(this.syncPlayerTime);
-    };
+    }
 
     private syncPlayerTime = (player : YT.Player, track : EditorTrack) : void => {
         const isBeforeTrackStart = this.props.time <= track.trackStart;
@@ -69,9 +75,6 @@ export default class Preview extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        (window as any).xx = this;
-        (window as any)._ = lodash;
-
         this.playerNodes.forEach((el, track) => {
             const player = new YT.Player(el as any, {
                 videoId: track.videoId,
