@@ -9,8 +9,8 @@ export default class App extends React.Component {
         tracks: [
             {
                 videoId: 'QjxScn7cKo8',
-                videoInPoint: 0,
-                trackStart: 0,
+                videoInPoint: 2000,
+                trackStart: 2000,
                 duration: -1
             },
             {
@@ -51,6 +51,7 @@ export default class App extends React.Component {
                 if (it !== track) {
                     return it;
                 } else {
+                    // console.log(delta);
                     const newValue = it.trackStart + delta;
 
                     return {
@@ -70,7 +71,8 @@ export default class App extends React.Component {
                 } else {
                     return {
                         ...track,
-                        videoInPoint: it.videoInPoint + delta
+                        videoInPoint: it.videoInPoint + delta,
+                        trackStart: it.trackStart + delta
                     };
                 }
             })

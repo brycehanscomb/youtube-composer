@@ -9,9 +9,8 @@ export default class TimelinePlayhead extends React.Component<any, any> {
             return;
         }
 
-        const xPos = getWidth(this.props.currentTime, this.props.zoom, true);
-        const xPosInt = xPos / 1000;
-        this.rootNode.style.left = `${xPosInt}px`;
+        const xPos = getWidth(this.props.currentTime, this.props.zoom);
+        this.rootNode.style.left = `${xPos}px`;
     }
 
     render() {

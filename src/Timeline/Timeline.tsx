@@ -112,6 +112,7 @@ export default class Timeline extends React.Component<any, IState> {
                             return (
                                 <TimelineTrack
                                     zoom={this.state.zoom}
+                                    videoInPoint={track.videoInPoint}
                                     startOffset={track.trackStart}
                                     duration={track.duration}
                                     videoId={track.videoId}
