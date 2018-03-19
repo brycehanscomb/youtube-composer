@@ -22,7 +22,7 @@ export default class Timeline extends React.Component<any, IState> {
     };
 
     play = () => {
-        this.props.onPlayheadMove(333);
+        this.props.onPlayheadMove(333, true);
         this.keepPlayheadInView();
         this.playTimer = setTimeout(this.play, 333);
     };
@@ -30,6 +30,7 @@ export default class Timeline extends React.Component<any, IState> {
     stop = () => {
         clearTimeout(this.playTimer);
         this.playTimer = null;
+        this.props.onPlayheadMove(0, false);
         this.keepPlayheadInView();
     };
 

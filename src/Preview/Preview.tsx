@@ -4,7 +4,8 @@ import {throttle} from 'lodash';
 
 interface IProps {
     tracks: Array<EditorTrack>,
-    time: number
+    time: number,
+    isPlaying: boolean
 }
 
 interface IState {
@@ -44,6 +45,12 @@ export default class Preview extends React.Component<IProps, IState> {
 
     private sync() {
         this.players.forEach(this.syncPlayerTime);
+
+        if (this.props.isPlaying) {
+            this.players.forEach(player => player.playVideo());
+        } else {
+            this.players.forEach(player => player.pauseVideo());
+        }
     }
 
     private syncPlayerTime = (player : YT.Player, track : EditorTrack) : void => {

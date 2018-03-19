@@ -16,7 +16,8 @@ export interface EditorTrack {
 
 export default class App extends React.Component<any, {
     tracks: Array<EditorTrack>,
-    playheadPosition: number
+    playheadPosition: number,
+    isPlaying: boolean
 }> {
     state = {
         tracks: [
@@ -37,7 +38,8 @@ export default class App extends React.Component<any, {
                 volume: 100
             },
         ],
-        playheadPosition: 0
+        playheadPosition: 0,
+        isPlaying: false
     };
 
     componentDidMount() {
@@ -155,9 +157,10 @@ export default class App extends React.Component<any, {
         });
     };
 
-    handlePlayheadPositionChange = (delta : number) : void => {
+    handlePlayheadPositionChange = (delta : number, shouldBePlaying : boolean) : void => {
         this.setState({
-            playheadPosition: this.state.playheadPosition + delta
+            playheadPosition: this.state.playheadPosition + delta,
+            isPlaying: shouldBePlaying
         });
     };
 
@@ -170,6 +173,7 @@ export default class App extends React.Component<any, {
                         <Preview
                             time={this.state.playheadPosition}
                             tracks={this.state.tracks}
+                            isPlaying={this.state.isPlaying}
                         />
                     </WaitFor>
                 </div>
