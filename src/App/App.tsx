@@ -157,7 +157,7 @@ export default class App extends React.Component<any, {
         });
     };
 
-    handlePlayheadPositionChange = (delta : number, shouldBePlaying : boolean) : void => {
+    handlePlayheadPositionChange = (delta : number, shouldBePlaying : boolean = this.state.isPlaying) : void => {
         this.setState({
             playheadPosition: this.state.playheadPosition + delta,
             isPlaying: shouldBePlaying
