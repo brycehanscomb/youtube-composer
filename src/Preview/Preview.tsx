@@ -71,7 +71,21 @@ export default class Preview extends React.Component<IProps, IState> {
     };
 
     private seekTo(player : YT.Player, ms : number) {
-        player.seekTo(sec(ms), true);
+        /**
+         * Since the player can only seek to the nearest keyframe,
+         * we may not have the player seek to the exact millisecond
+         * that we intended. However, constantly syncing to the
+         * closest-available keyframe sounds choppy to the ear,
+         * so we compromise and only "nudge" they player's actual
+         * position to where it "should be" if the difference
+         * between where-it-is and where-it-should-be is over a
+         * certain time threshold.
+         */
+        const timeError = (player.getCurrentTime() * 1000) - this.props.time;
+
+        if (Math.abs(timeError) > 100) {
+            player.seekTo(sec(ms), true);
+        }
     }
 
     componentDidUpdate() {
