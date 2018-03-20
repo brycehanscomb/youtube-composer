@@ -13,7 +13,7 @@ export function initYoutubeAPI() {
 }
 
 export function getVideoDuration(videoId: string) : Promise<number> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject)=> {
         const targetNode = document.createElement('div');
         targetNode.className = 'hidden';
 
@@ -31,7 +31,8 @@ export function getVideoDuration(videoId: string) : Promise<number> {
                         player.destroy();
                         targetNode.remove();
                     }
-                }
+                },
+                onError: reject
             }
         });
     });
