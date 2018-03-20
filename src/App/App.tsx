@@ -24,15 +24,15 @@ export default class App extends React.Component<any, {
             {
                 videoId: 'VD5_CQio-Bw',
                 videoInPoint: 0,
-                trackStart: 2300,
+                trackStart: 2300 + 2400,
                 duration: -1,
                 videoOutPoint: -1,
-                volume: 80
+                volume: 60
             },
             {
                 videoId: 'GwY_REfDyWc',
                 videoInPoint: 0,
-                trackStart: 0,
+                trackStart: 0 + 2400,
                 duration: -1,
                 videoOutPoint: -1,
                 volume: 90
@@ -40,19 +40,27 @@ export default class App extends React.Component<any, {
             {
                 videoId: 'jJT8KooAWKc',
                 videoInPoint: 0,
-                trackStart: 2300,
+                trackStart: 2300 + 2400,
                 duration: -1,
                 videoOutPoint: -1,
                 volume: 100
-            }
+            },
             // {
             //     videoId: 's9Oh5nTZYoM',
             //     videoInPoint: 0,
             //     trackStart: 2300 - 50,
             //     duration: -1,
             //     videoOutPoint: -1,
-            //     volume: 100
+            //     volume: 0
             // },
+            {
+                videoId: 'M1F0lBnsnkE',
+                videoInPoint: 0,
+                trackStart: 0,
+                videoOutPoint: -1,
+                duration: -1,
+                volume: 0
+            }
         ],
         playheadPosition: 0,
         isPlaying: false
