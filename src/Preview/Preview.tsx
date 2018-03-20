@@ -74,6 +74,12 @@ export default class Preview extends React.Component<IProps, IState> {
         }
     }
 
+    componentWillUnmount() {
+        this.players.forEach(player => player.destroy());
+        this.players.clear();
+        this.playerNodes.clear();
+    }
+
     componentDidMount() {
         this.playerNodes.forEach((el, track) => {
             const player = new YT.Player(el as any, {
