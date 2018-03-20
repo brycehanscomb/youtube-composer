@@ -22,21 +22,37 @@ export default class App extends React.Component<any, {
     state = {
         tracks: [
             {
-                videoId: 'jo2FxCXDTPM',
+                videoId: 'VD5_CQio-Bw',
                 videoInPoint: 0,
-                trackStart: 0,
+                trackStart: 2300,
                 duration: -1,
                 videoOutPoint: -1,
-                volume: 100
+                volume: 80
             },
             {
-                videoId: '-UxD1FObOH4',
+                videoId: 'GwY_REfDyWc',
                 videoInPoint: 0,
                 trackStart: 0,
                 duration: -1,
                 videoOutPoint: -1,
-                volume: 100
+                volume: 90
             },
+            {
+                videoId: 'jJT8KooAWKc',
+                videoInPoint: 0,
+                trackStart: 2300,
+                duration: -1,
+                videoOutPoint: -1,
+                volume: 100
+            }
+            // {
+            //     videoId: 's9Oh5nTZYoM',
+            //     videoInPoint: 0,
+            //     trackStart: 2300 - 50,
+            //     duration: -1,
+            //     videoOutPoint: -1,
+            //     volume: 100
+            // },
         ],
         playheadPosition: 0,
         isPlaying: false
