@@ -4,7 +4,8 @@ import {throttle} from 'lodash';
 
 interface IProps {
     tracks: Array<EditorTrack>,
-    time: number
+    time: number,
+    isPlaying: boolean
 }
 
 interface IState {
@@ -44,6 +45,12 @@ export default class Preview extends React.Component<IProps, IState> {
 
     private sync() {
         this.players.forEach(this.syncPlayerTime);
+
+        if (this.props.isPlaying) {
+            this.players.forEach(player => player.playVideo());
+        } else {
+            this.players.forEach(player => player.pauseVideo());
+        }
     }
 
     private syncPlayerTime = (player : YT.Player, track : EditorTrack) : void => {
@@ -64,7 +71,21 @@ export default class Preview extends React.Component<IProps, IState> {
     };
 
     private seekTo(player : YT.Player, ms : number) {
-        player.seekTo(sec(ms), true);
+        /**
+         * Since the player can only seek to the nearest keyframe,
+         * we may not have the player seek to the exact millisecond
+         * that we intended. However, constantly syncing to the
+         * closest-available keyframe sounds choppy to the ear,
+         * so we compromise and only "nudge" they player's actual
+         * position to where it "should be" if the difference
+         * between where-it-is and where-it-should-be is over a
+         * certain time threshold.
+         */
+        const timeError = (player.getCurrentTime() * 1000) - this.props.time;
+
+        if (Math.abs(timeError) > 100) {
+            player.seekTo(sec(ms), true);
+        }
     }
 
     componentDidUpdate() {
@@ -101,7 +122,7 @@ export default class Preview extends React.Component<IProps, IState> {
                         if (event.data === YT.PlayerState.PLAYING) {
                             if (this.isReady() === false) {
                                 player.pauseVideo();
-                                player.setVolume(100);
+                                player.setVolume(track.volume);
                                 player.seekTo(track.videoInPoint / 1000, true);
                                 this.players.set(track, player);
                                 this.setState({
