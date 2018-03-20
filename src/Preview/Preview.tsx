@@ -1,6 +1,9 @@
 import * as React from 'react';
 import {EditorTrack} from "../App/App";
-import {throttle} from 'lodash';
+import {noop} from 'lodash';
+import Timer = NodeJS.Timer;
+import SuggestedVideoQuality = YT.SuggestedVideoQuality;
+import VideoQualitySmall = YT.VideoQualitySmall;
 
 interface IProps {
     tracks: Array<EditorTrack>,
@@ -28,6 +31,8 @@ export default class Preview extends React.Component<IProps, IState> {
         return this.state.readyPlayers === this.props.tracks.length;
     };
 
+    private playQueue : Array<Timer> = [];
+
     private registerPlayerNode = (track, el : HTMLElement | null) : void => {
 
         if (!el) {
@@ -37,61 +42,47 @@ export default class Preview extends React.Component<IProps, IState> {
         this.playerNodes.set(track, el);
     };
 
-    constructor(props) {
-        super(props);
+    onReady = () => {
+        this.playerNodes.clear(); // don't need the divs anymore, they've been replaced by YT player iframes
 
-        this.sync = throttle(this.sync.bind(this), 2000);
-    }
-
-    private sync() {
-        this.players.forEach(this.syncPlayerTime);
-
-        if (this.props.isPlaying) {
-            this.players.forEach(player => player.playVideo());
-        } else {
-            this.players.forEach(player => player.pauseVideo());
-        }
-    }
-
-    private syncPlayerTime = (player : YT.Player, track : EditorTrack) : void => {
-        const isBeforeTrackStart = this.props.time <= track.trackStart;
-        const isAfterTrackEnd = this.props.time >= (
-            track.videoOutPoint // TODO: what if this doesn't start at zero
-            // TODO: what if this is trimmed?
-        );
-
-        if (isBeforeTrackStart) {
-            this.seekTo(player, track.trackStart);
-        } else if (isAfterTrackEnd) {
-            this.seekTo(player, track.videoOutPoint)
-        } else {
-            player.playVideo();
-            this.seekTo(player, this.props.time);
-        }
+        this.onReady = noop;
     };
 
-    private seekTo(player : YT.Player, ms : number) {
-        /**
-         * Since the player can only seek to the nearest keyframe,
-         * we may not have the player seek to the exact millisecond
-         * that we intended. However, constantly syncing to the
-         * closest-available keyframe sounds choppy to the ear,
-         * so we compromise and only "nudge" they player's actual
-         * position to where it "should be" if the difference
-         * between where-it-is and where-it-should-be is over a
-         * certain time threshold.
-         */
-        const timeError = (player.getCurrentTime() * 1000) - this.props.time;
+    // private seekTo(player : YT.Player, ms : number) {
+    //     /**
+    //      * Since the player can only seek to the nearest keyframe,
+    //      * we may not have the player seek to the exact millisecond
+    //      * that we intended. However, constantly syncing to the
+    //      * closest-available keyframe sounds choppy to the ear,
+    //      * so we compromise and only "nudge" they player's actual
+    //      * position to where it "should be" if the difference
+    //      * between where-it-is and where-it-should-be is over a
+    //      * certain time threshold.
+    //      */
+    //     const timeError = (player.getCurrentTime() * 1000) - this.props.time;
+    //
+    //     if (Math.abs(timeError) > 200) {
+    //         player.seekTo(sec(ms), true);
+    //     }
+    // }
 
-        if (Math.abs(timeError) > 100) {
-            player.seekTo(sec(ms), true);
-        }
-    }
-
-    componentDidUpdate() {
+    componentDidUpdate(prevProps : IProps) {
         if (this.isReady()) {
-            this.playerNodes.clear(); // don't need the divs anymore, they've been replaced by YT player iframes
-            this.sync();
+            this.onReady();
+        }
+
+        if (
+            prevProps.isPlaying === false &&
+            this.props.isPlaying === true
+        ) {
+            this.setupPlayQueue();
+        }
+
+        if (
+            prevProps.isPlaying === true &&
+            this.props.isPlaying === false
+        ) {
+            this.pauseAll();
         }
     }
 
@@ -101,7 +92,42 @@ export default class Preview extends React.Component<IProps, IState> {
         this.playerNodes.clear();
     }
 
-    componentDidMount() {
+    private pauseAll() {
+        this.destroyPlayQueue();
+        this.players.forEach(player => player.pauseVideo());
+    }
+
+    private destroyPlayQueue = () => {
+        this.playQueue.forEach(clearTimeout);
+        this.playQueue.length = 0;
+    };
+
+    private setupPlayQueue = () => {
+        this.destroyPlayQueue();
+
+        this.props.tracks.forEach(track => {
+            const player = this.players.get(track);
+
+            if (!player) {
+                console.warn('could not find player');
+                return;
+            }
+
+            player.seekTo(
+                sec(track.videoInPoint),
+                true
+            );
+
+            const timer = setTimeout(
+                () => player.playVideo(),
+                track.trackStart
+            );
+
+            this.playQueue.push(timer);
+        });
+    };
+
+    componentDidMount() : void {
         this.playerNodes.forEach((el, track) => {
             const player = new YT.Player(el as any, {
                 videoId: track.videoId,
@@ -114,6 +140,7 @@ export default class Preview extends React.Component<IProps, IState> {
                 height: 200,
                 events: {
                     onReady: () => {
+                        player.setPlaybackQuality('small')
                         player.setVolume(0);
                         player.seekTo(track.videoInPoint / 1000, true);
                         player.playVideo();
