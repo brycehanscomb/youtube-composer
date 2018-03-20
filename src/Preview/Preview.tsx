@@ -2,8 +2,6 @@ import * as React from 'react';
 import {EditorTrack} from "../App/App";
 import {noop} from 'lodash';
 import Timer = NodeJS.Timer;
-import SuggestedVideoQuality = YT.SuggestedVideoQuality;
-import VideoQualitySmall = YT.VideoQualitySmall;
 
 interface IProps {
     tracks: Array<EditorTrack>,
