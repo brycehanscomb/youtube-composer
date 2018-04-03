@@ -26,15 +26,15 @@ export default class App extends React.Component<any, {
                 videoInPoint: 68000,
                 trackStart: 0,
                 duration: -1,
-                videoOutPoint: 80000,
-                volume: 100
+                videoOutPoint: 80500,
+                volume: 70
             },
             {
                 videoId: '04854XqcfCY',
                 videoInPoint: 34000,
                 trackStart: 12000,
                 duration: -1,
-                videoOutPoint: -1,
+                videoOutPoint: 46500,
                 volume: 100
             }
         ],

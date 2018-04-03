@@ -116,12 +116,19 @@ export default class Preview extends React.Component<IProps, IState> {
                 true
             );
 
-            const timer = setTimeout(
+            const startTimer = setTimeout(
                 () => player.playVideo(),
                 track.trackStart
             );
 
-            this.playQueue.push(timer);
+            this.playQueue.push(startTimer);
+
+            const endTimer = setTimeout(
+                () => player.pauseVideo(),
+                track.trackStart + (track.videoOutPoint - track.videoInPoint)
+            );
+
+            this.playQueue.push(endTimer);
         });
     };
 
