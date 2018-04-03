@@ -22,44 +22,20 @@ export default class App extends React.Component<any, {
     state = {
         tracks: [
             {
-                videoId: 'VD5_CQio-Bw',
-                videoInPoint: 0,
-                trackStart: 2300 + 2400,
+                videoId: '-5-K51jHQ6k',
+                videoInPoint: 68000,
+                trackStart: 0,
                 duration: -1,
-                videoOutPoint: -1,
-                volume: 60
+                videoOutPoint: 80000,
+                volume: 100
             },
             {
-                videoId: 'GwY_REfDyWc',
-                videoInPoint: 0,
-                trackStart: 0 + 2400,
-                duration: -1,
-                videoOutPoint: -1,
-                volume: 90
-            },
-            {
-                videoId: 'jJT8KooAWKc',
-                videoInPoint: 0,
-                trackStart: 2300 + 2400,
+                videoId: '04854XqcfCY',
+                videoInPoint: 34000,
+                trackStart: 12000,
                 duration: -1,
                 videoOutPoint: -1,
                 volume: 100
-            },
-            // {
-            //     videoId: 's9Oh5nTZYoM',
-            //     videoInPoint: 0,
-            //     trackStart: 2300 - 50,
-            //     duration: -1,
-            //     videoOutPoint: -1,
-            //     volume: 0
-            // },
-            {
-                videoId: 'M1F0lBnsnkE',
-                videoInPoint: 0,
-                trackStart: 0,
-                videoOutPoint: -1,
-                duration: -1,
-                volume: 0
             }
         ],
         playheadPosition: 0,
@@ -67,21 +43,27 @@ export default class App extends React.Component<any, {
     };
 
     componentDidMount() {
-        Promise.all(
-            this.state.tracks
-                .map(track => track.videoId)
-                .map(getVideoDuration)
-        ).then((durations : Array<number>) => {
-            this.setState({
-                tracks: this.state.tracks.map((track, index) => {
-                    return {
-                        ...track,
-                        duration: durations[index],
-                        videoOutPoint: durations[index] - track.videoInPoint
-                    };
+        if (this.state.tracks.length) {
+            Promise.all(
+                this.state.tracks
+                    .map(track => {
+                        return track.videoId;
+                    })
+                    .map(getVideoDuration)
+            ).then((durations: Array<number>) => {
+                this.setState({
+                    tracks: this.state.tracks.map((track, index) => {
+                        return {
+                            ...track,
+                            duration: durations[index],
+                            videoOutPoint: track.videoOutPoint === -1
+                                ? durations[index] - track.videoInPoint
+                                : track.videoOutPoint
+                        };
+                    })
                 })
-            })
-        });
+            });
+        }
     }
 
     areDurationsReady = () => {
