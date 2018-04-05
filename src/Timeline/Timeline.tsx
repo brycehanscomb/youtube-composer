@@ -27,20 +27,27 @@ export default class Timeline extends React.Component<IProps, IState> {
     private tracksEl : HTMLElement | null;
 
     private playTimer;
+    private endOfSceneStopTimer;
 
     rewind = () => {
         this.props.onPlayheadMove(0 - this.props.playheadPosition);
     };
 
     play = () => {
-        this.props.onPlayheadMove(333, true);
+        const stepsPerSecond = 3;
+        const playStepTime = (1000 / stepsPerSecond);
+
+        this.props.onPlayheadMove(playStepTime, true);
         this.keepPlayheadInView();
-        this.playTimer = setTimeout(this.play, 333);
+        this.playTimer = setTimeout(this.play, playStepTime);
+        this.endOfSceneStopTimer = setTimeout(this.stop, (this.getSceneDuration() - this.props.playheadPosition) + playStepTime);
     };
 
     stop = () => {
         clearTimeout(this.playTimer);
+        clearTimeout(this.endOfSceneStopTimer);
         this.playTimer = null;
+        this.endOfSceneStopTimer = null;
         this.props.onPlayheadMove(0, false);
         this.keepPlayheadInView();
     };
@@ -97,6 +104,16 @@ export default class Timeline extends React.Component<IProps, IState> {
 
     handlePlayheadMoved = (delta : number) => {
         this.props.onPlayheadMove(delta);
+    };
+
+    getSceneDuration = () : number => {
+        return this.props.tracks.reduce((acc : number, cur : EditorTrack) : number => {
+            const startsAt = cur.trackStart;
+            const videoLength = cur.videoOutPoint - cur.videoInPoint;
+            const endPoint = startsAt + videoLength;
+
+            return Math.max(acc, endPoint);
+        }, 0);
     };
 
     render() {
