@@ -3,6 +3,7 @@
     height: 50px;
     background-size: contain;
     justify-content: space-between;
+    position: relative;
 }
 
 .TimelineTrack__CropHandle {
@@ -45,4 +46,15 @@
 .TimelineTrack__NudgeHandle:active {
     cursor: grabbing;
     background: rgba(0,0,0,0.2);
+}
+
+.TimelineTrack__VolumeHandle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 2px;
+    border-bottom: 1px solid green;
+    background: greenyellow;
+    cursor: ns-resize;
 }

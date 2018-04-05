@@ -16,7 +16,8 @@ interface IProps {
     onPlayheadMove: Function,
     onTrimStart: Function,
     onTrimEnd: Function
-    onTrackNudge: Function
+    onTrackNudge: Function,
+    onTrackVolumeChange: Function
 }
 
 export default class Timeline extends React.Component<IProps, IState> {
@@ -102,6 +103,11 @@ export default class Timeline extends React.Component<IProps, IState> {
         this.props.onTrackNudge(track, delta);
     };
 
+
+    handleTrackVolumeChange = (track, delta : number) => {
+        this.props.onTrackVolumeChange(track, delta);
+    };
+
     handlePlayheadMoved = (delta : number) => {
         this.props.onPlayheadMove(delta);
     };
@@ -166,6 +172,8 @@ export default class Timeline extends React.Component<IProps, IState> {
                                     key={track.videoId}
                                     onTrim={(whichEnd, delta) => this.handleTrackTrim(track, whichEnd, delta)}
                                     onNudge={delta => this.handleTrackNudge(track, delta)}
+                                    volume={track.volume}
+                                    onVolumeChange={delta => this.handleTrackVolumeChange(track, delta)}
                                 />
                             );
                         })}

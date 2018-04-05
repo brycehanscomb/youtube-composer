@@ -82,7 +82,65 @@ export default class Preview extends React.Component<IProps, IState> {
         ) {
             this.pauseAll();
         }
+
+        this.setVolumeLevels();
     }
+
+    componentWillReceiveProps(nextProps : IProps) {
+        if (this.props.tracks !== nextProps.tracks) {
+            this.syncPlayerReferences(nextProps);
+        }
+    }
+
+    /**
+     * Since we're being immutable, any time one of the tracks
+     * changes, the player-track references are obsoleted and
+     * need to be re-synced
+     */
+    syncPlayerReferences = (props : IProps = this.props) => {
+        const { tracks } = props;
+
+        const newNodes : Map<EditorTrack, HTMLElement> = new Map();
+        const newPlayers : Map<EditorTrack, YT.Player> = new Map();
+
+        this.playerNodes.forEach((node, track) => {
+            if (tracks.includes(track)) {
+                newNodes.set(track, node);
+            } else {
+                const equivalentTrack = tracks.find(t => t.videoId === track.videoId);
+                if (equivalentTrack) {
+                    newNodes.set(equivalentTrack, node);
+                }
+            }
+        });
+
+        this.players.forEach((player, track) => {
+            if (tracks.includes(track)) {
+                newPlayers.set(track, player);
+            } else {
+                const equivalentTrack = tracks.find(t => t.videoId === track.videoId);
+                if (equivalentTrack) {
+                    newPlayers.set(equivalentTrack, player);
+                }
+            }
+        });
+
+        this.playerNodes = newNodes;
+        this.players = newPlayers;
+    };
+
+    setVolumeLevels = () => {
+        this.props.tracks.forEach(track => {
+            const player = this.players.get(track);
+
+            if (!player) {
+                console.warn('could not find player');
+                return;
+            }
+
+            player.setVolume(track.volume);
+        });
+    };
 
     componentWillUnmount() {
         this.players.forEach(player => player.destroy());

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {clamp} from 'lodash';
 import './App.css';
 import Timeline from "../Timeline/Timeline";
 import {getVideoDuration} from "../MetaGatherer";
@@ -83,6 +84,23 @@ export default class App extends React.Component<any, {
                     return {
                         ...track,
                         trackStart: Math.max(0, newValue)
+                    };
+                }
+            })
+        });
+    };
+
+    onTrackVolumeChange = (track, delta : number) => {
+        this.setState({
+            tracks: this.state.tracks.map(it => {
+                if (it !== track) {
+                    return it;
+                } else {
+                    const newValue = it.volume + delta;
+
+                    return {
+                        ...track,
+                        volume: clamp(newValue, 0, 100)
                     };
                 }
             })
@@ -191,6 +209,7 @@ export default class App extends React.Component<any, {
                         onTrimStart={this.onTrimStart}
                         onTrimEnd={this.onTrimEnd}
                         onTrackNudge={this.onTrackNudge}
+                        onTrackVolumeChange={this.onTrackVolumeChange}
                     />
                 </WaitFor>
             </div>

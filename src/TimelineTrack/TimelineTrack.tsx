@@ -10,18 +10,24 @@ interface IProps {
     startOffset: number,
     onTrim: (whichEnd : 'start' | 'end', delta: number) => void,
     onNudge: (delta: number) => void,
+    onVolumeChange: (delta : number) => void,
     videoInPoint: number,
     videoOutPoint: number,
+    volume: number
 }
+
+const flipSign = (n : number) : number => n * -1;
 
 export default class TimelineTrack extends React.Component<IProps, any> {
 
+    private rootNode : HTMLElement | null;
     private cropHandleLeft : HTMLElement | null;
     private cropHandleRight : HTMLElement | null;
     private nudgeHandle : HTMLElement | null;
+    private volumeHandle : HTMLElement | null;
 
     componentDidMount() {
-        if (!this.cropHandleLeft || !this.cropHandleRight || !this.nudgeHandle) {
+        if (!this.cropHandleLeft || !this.cropHandleRight || !this.nudgeHandle || !this.volumeHandle) {
             return;
         }
 
@@ -33,21 +39,37 @@ export default class TimelineTrack extends React.Component<IProps, any> {
 
         interact(this.cropHandleRight).draggable({ axis: 'x' })
             .on('dragmove', this.onCropHandleDragMove.bind(this, 'end'));
+
+        interact(this.volumeHandle).draggable({axis: 'y'})
+            .on('dragmove', this.onVolumeHandleMove);
     }
 
     componentWillUnmount() {
-        if (!this.cropHandleLeft || !this.cropHandleRight || !this.nudgeHandle) {
+        if (!this.cropHandleLeft || !this.cropHandleRight || !this.nudgeHandle || !this.volumeHandle) {
             return;
         }
 
         interact(this.nudgeHandle).unset();
         interact(this.cropHandleLeft).unset();
         interact(this.cropHandleRight).unset();
+        interact(this.volumeHandle).unset();
     }
 
     onNudgeHandleDragMove = (event: Interact.InteractEvent) => {
         const deltaTime = getMilliSecondsFromPixelWidth(event.dx, this.props.zoom);
         this.props.onNudge(deltaTime);
+    };
+
+    onVolumeHandleMove = (event: Interact.InteractEvent) => {
+        if (!this.rootNode) {
+            return;
+        }
+
+        const deltaPx = flipSign(event.dy);
+        const containerHeight = this.rootNode.getBoundingClientRect().height;
+        const percentageChange = (deltaPx / containerHeight) * 100;
+
+        this.props.onVolumeChange(percentageChange);
     };
 
     onCropHandleDragMove = (whichEnd : 'start' | 'end', event : Interact.InteractEvent) => {
@@ -57,7 +79,7 @@ export default class TimelineTrack extends React.Component<IProps, any> {
 
     render() {
         return (
-            <div className="TimelineTrack" style={{
+            <div ref={el => this.rootNode = el} className="TimelineTrack" style={{
                 backgroundImage: `url("http://img.youtube.com/vi/${this.props.videoId}/default.jpg")`,
                 width: getWidth(this.props.videoOutPoint - this.props.videoInPoint, this.props.zoom),
                 marginLeft: getWidth(this.props.startOffset, this.props.zoom)
@@ -65,6 +87,12 @@ export default class TimelineTrack extends React.Component<IProps, any> {
                 <div ref={el => this.cropHandleLeft = el} className="TimelineTrack__CropHandle left" />
                 <div ref={el => this.nudgeHandle = el} className="TimelineTrack__NudgeHandle" />
                 <div ref={el => this.cropHandleRight = el} className="TimelineTrack__CropHandle right" />
+                <div
+                    title={`Volume: ${this.props.volume}%`}
+                    ref={el => this.volumeHandle = el}
+                    className="TimelineTrack__VolumeHandle"
+                    style={{top: `${100 - this.props.volume}%` }}
+                />
             </div>
         );
     }
