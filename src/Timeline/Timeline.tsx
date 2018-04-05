@@ -3,12 +3,23 @@ import './Timeline.css';
 import TimelineTrack from "../TimelineTrack/TimelineTrack";
 import {getWidth} from "../utils";
 import TimelinePlayhead from "../TimelinePlayhead/TimelinePlayhead";
+import {EditorTrack} from "../App/App";
 
 interface IState {
     zoom: number,
 }
 
-export default class Timeline extends React.Component<any, IState> {
+interface IProps {
+    tracks: Array<EditorTrack>
+    playheadPosition: number,
+
+    onPlayheadMove: Function,
+    onTrimStart: Function,
+    onTrimEnd: Function
+    onTrackNudge: Function
+}
+
+export default class Timeline extends React.Component<IProps, IState> {
     state = {
         zoom: 0,
     };
