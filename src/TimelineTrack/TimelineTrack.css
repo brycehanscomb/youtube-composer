@@ -1,5 +1,19 @@
 .TimelineTrack {
     display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #cdcdcd;
+}
+
+.TimelineTrack__Tools {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    width: 80px;
+    border-right: 3px solid #cdcdcd;
+}
+
+.TimelineTrack__Track {
+    display: flex;
     height: 50px;
     background-size: contain;
     justify-content: space-between;

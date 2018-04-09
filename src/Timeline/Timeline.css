@@ -30,8 +30,9 @@
     border: 1px solid white;
     position: relative;
     will-change: left;
-    transform: translateX(-50%);
+    transform: translateX(calc(80px - 50%));
     cursor: grab;
+    z-index: 2;
 }
 
 .Timeline__Playhead:active {

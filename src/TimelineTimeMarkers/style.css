@@ -1,0 +1,9 @@
+.Timeline__TimeMarker {
+    position: absolute;
+    margin-left: 80px;
+    padding-left: 3px;
+    border-left: 1px solid #888;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: rgba(0, 0, 0, 0.5);
+}

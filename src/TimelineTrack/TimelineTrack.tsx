@@ -26,6 +26,10 @@ export default class TimelineTrack extends React.Component<IProps, any> {
     private nudgeHandle : HTMLElement | null;
     private volumeHandle : HTMLElement | null;
 
+    state = {
+        nominalVolume: this.props.volume || 100
+    };
+
     componentDidMount() {
         if (!this.cropHandleLeft || !this.cropHandleRight || !this.nudgeHandle || !this.volumeHandle) {
             return;
@@ -72,6 +76,14 @@ export default class TimelineTrack extends React.Component<IProps, any> {
         this.props.onVolumeChange(percentageChange);
     };
 
+    onMuteToggled = () => {
+        if (this.props.volume === 0) {
+            this.props.onVolumeChange((-this.props.volume) + this.state.nominalVolume);
+        } else {
+            this.props.onVolumeChange(-this.props.volume);
+        }
+    };
+
     onCropHandleDragMove = (whichEnd : 'start' | 'end', event : Interact.InteractEvent) => {
         const deltaTime = getMilliSecondsFromPixelWidth(event.dx, this.props.zoom);
         this.props.onTrim(whichEnd, deltaTime);
@@ -79,20 +91,27 @@ export default class TimelineTrack extends React.Component<IProps, any> {
 
     render() {
         return (
-            <div ref={el => this.rootNode = el} className="TimelineTrack" style={{
-                backgroundImage: `url("http://img.youtube.com/vi/${this.props.videoId}/default.jpg")`,
-                width: getWidth(this.props.videoOutPoint - this.props.videoInPoint, this.props.zoom),
-                marginLeft: getWidth(this.props.startOffset, this.props.zoom)
-            }}>
-                <div ref={el => this.cropHandleLeft = el} className="TimelineTrack__CropHandle left" />
-                <div ref={el => this.nudgeHandle = el} className="TimelineTrack__NudgeHandle" />
-                <div ref={el => this.cropHandleRight = el} className="TimelineTrack__CropHandle right" />
-                <div
-                    title={`Volume: ${this.props.volume}%`}
-                    ref={el => this.volumeHandle = el}
-                    className="TimelineTrack__VolumeHandle"
-                    style={{top: `${100 - this.props.volume}%` }}
-                />
+            <div className="TimelineTrack">
+                <div className="TimelineTrack__Tools">
+                    <button onClick={this.onMuteToggled} title={this.props.volume > 0 ? 'Mute' : 'Un-mute'}>
+                        🔈 {Math.floor(this.props.volume)}
+                    </button>
+                </div>
+                <div ref={el => this.rootNode = el} className="TimelineTrack__Track" style={{
+                    backgroundImage: `url("http://img.youtube.com/vi/${this.props.videoId}/default.jpg")`,
+                    width: getWidth(this.props.videoOutPoint - this.props.videoInPoint, this.props.zoom),
+                    marginLeft: getWidth(this.props.startOffset, this.props.zoom)
+                }}>
+                    <div ref={el => this.cropHandleLeft = el} className="TimelineTrack__CropHandle left"/>
+                    <div ref={el => this.nudgeHandle = el} className="TimelineTrack__NudgeHandle"/>
+                    <div ref={el => this.cropHandleRight = el} className="TimelineTrack__CropHandle right"/>
+                    <div
+                        title={`Volume: ${this.props.volume}%`}
+                        ref={el => this.volumeHandle = el}
+                        className="TimelineTrack__VolumeHandle"
+                        style={{top: `${100 - this.props.volume}%`}}
+                    />
+                </div>
             </div>
         );
     }

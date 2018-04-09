@@ -4,6 +4,7 @@ import TimelineTrack from "../TimelineTrack/TimelineTrack";
 import {getWidth} from "../utils";
 import TimelinePlayhead from "../TimelinePlayhead/TimelinePlayhead";
 import {EditorTrack} from "../App/App";
+import TimelineTimeMarkers from "../TimelineTimeMarkers/TimelineTimeMarkers";
 
 interface IState {
     zoom: number,
@@ -158,6 +159,10 @@ export default class Timeline extends React.Component<IProps, IState> {
                                 currentTime={this.props.playheadPosition}
                                 zoom={this.state.zoom}
                                 onMove={this.handlePlayheadMoved}
+                            />
+                            <TimelineTimeMarkers
+                                zoom={this.state.zoom}
+                                currentTime={this.props.playheadPosition}
                             />
                         </div>
                         {this.props.tracks.map(track => {
